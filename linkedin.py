@@ -2,9 +2,11 @@ import time,math,random,os
 import utils,constants,config
 
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from utils import prRed,prYellow,prGreen
-
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromeService
 
@@ -94,6 +96,16 @@ class Linkedin:
                             countApplied += 1
                             try:
                                 self.chooseResume()
+                                # Click the 'Next' button
+                                next_button = self.driver.find_element(By.CSS_SELECTOR,"button[aria-label='Continue to next step']")
+                                next_button.click()
+                                time.sleep(random.uniform(1, constants.botSpeed))
+
+                                # Click the 'Review' button
+                                review_button = self.driver.find_element(By.CSS_SELECTOR,"button[aria-label='Review your application']")
+                                review_button.click()
+                                time.sleep(random.uniform(1, constants.botSpeed))
+
                                 self.driver.find_element(By.CSS_SELECTOR, "button[aria-label='Submit application']").click()
                                 time.sleep(random.uniform(1, constants.botSpeed))
 
@@ -201,12 +213,14 @@ class Linkedin:
 
     def easyApplyButton(self):
         try:
-            time.sleep(random.uniform(1, constants.botSpeed))
-            button = self.driver.find_element(By.XPATH,
-                '//button[contains(@class, "jobs-apply-button")]')
+            wait = WebDriverWait(self.driver, 10)
+          #  button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(@class, "jobs-apply-button--top-card")]')))
+            button = wait.until(EC.element_to_be_clickable((By.XPATH,'//button[contains(@class, "jobs-apply-button") and contains(@class, "artdeco-button") and contains(@class, "artdeco-button--3") and contains(@class, "artdeco-button--primary") and contains(@class, "ember-view")]')))
+
             EasyApplyButton = button
-        except: 
+        except:
             EasyApplyButton = False
+            print("Easy Apply button not found. Current URL:", self.driver.current_url)  # Print out the current URL for debugging
 
         return EasyApplyButton
 
